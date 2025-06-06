@@ -311,4 +311,183 @@ jobs:
           docker build -t your-app .
 docker run -p 8000:8000 your-app
 aws deploy start --application-name your-app --deployment-group your-group
+import subprocess
 
+def check_services():
+    services = ["database", "api", "security"]
+    for service in services:
+        status = subprocess.run(["systemctl", "is-active", service], capture_output=True, text=True)
+        if "inactive" in status.stdout:
+            print(f"Warning: {service} is not running!")
+            const { execSync } = require('child_process');
+
+function checkServices() {
+    const services = ['database', 'api', 'security'];
+    services.forEach(service => {
+        const status = execSync(`systemctl is-active ${service}`).toString();
+        if (status.includes('inactive')) {
+            console.warn(`Warning: ${service} is not running!`);
+        }
+    });
+}
+def validate_deployment():
+    test_results = run_tests()
+    failed_tests = [test for test in test_results if test.failed]
+    
+    if failed_tests:
+        print("Deployment halted due to failed tests.")
+        for test in failed_tests:
+            print(f"Fix required: {test.name}")
+    else:
+        print("Deployment validated successfully!")
+        function validateDeployment() {
+    const testResults = runTests();
+    const failedTests = testResults.filter(test => test.failed);
+
+    if (failedTests.length > 0) {
+        console.log('Deployment halted due to failed tests.');
+        failedTests.forEach(test => console.log(`Fix required: ${test.name}`));
+    } else {
+        console.log('Deployment validated successfully!');
+    }
+}
+name: Deployment Validation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          npm install
+
+      - name: Run Pre-Deployment Checks
+        run: |
+          python validate_deployment.py
+          node validateDeployment.js
+python validate_deployment.py
+node validateDeployment.js
+docker build -t your-app .
+docker run -p 8000:8000 your-app
+aws deploy start --application-name your-app --deployment-group your-group
+import subprocess
+
+def check_deployment_status():
+    status = subprocess.run(["systemctl", "is-active", "your-app"], capture_output=True, text=True)
+    if "inactive" in status.stdout:
+        print("Deployment failed! Initiating rollback...")
+        rollback_deployment()
+        const { execSync } = require('child_process');
+
+function checkDeploymentStatus() {
+    const status = execSync('systemctl is-active your-app').toString();
+    if (status.includes('inactive')) {
+        console.warn('Deployment failed! Initiating rollback...');
+        rollbackDeployment();
+    }
+}
+def rollback_deployment():
+    print("Rolling back to the last stable version...")
+    subprocess.run(["git", "reset", "--hard", "HEAD~1"])
+    subprocess.run(["systemctl", "restart", "your-app"])
+    print("Rollback completed successfully!")
+    name: Deployment Rollback
+
+on:
+  workflow_run:
+    workflows: ["Deployment Validation"]
+    types:
+      - completed
+
+jobs:
+  rollback:
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Initiate Rollback
+        run: |
+          git reset --hard HEAD~1
+          systemctl restart your-app
+          python rollback_deployment.py
+          node rollbackDeployment.js
+          docker rollback your-app
+          aws deploy rollback --application-name your-app --deployment-group your-group
+          import logging
+
+# Configure logging
+logging.basicConfig(
+    filename="logs/deployment_logs.txt",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+def log_deployment_status(status):
+    if status == "SUCCESS":
+        logging.info("Deployment completed successfully.")
+    elif status == "FAILURE":
+        logging.error("Deployment failed. Rollback initiated.")
+        const fs = require('fs');
+
+function logDeploymentStatus(status) {
+    const logMessage = `${new Date().toISOString()} - ${status} - Deployment status logged.\n`;
+    fs.appendFileSync('logs/deployment_logs.txt', logMessage);
+}
+import pandas as pd
+
+def analyze_deployment_logs():
+    logs = pd.read_csv("logs/deployment_logs.txt", delimiter=" - ", header=None)
+    failure_count = logs[1].value_counts().get("FAILURE", 0)
+    print(f"Total Failed Deployments: {failure_count}")
+    const fs = require('fs');
+
+function analyzeDeploymentLogs() {
+    const logs = fs.readFileSync('logs/deployment_logs.txt', 'utf-8').split('\n');
+    const failureCount = logs.filter(log => log.includes('FAILURE')).length;
+    console.log(`Total Failed Deployments: ${failureCount}`);
+}
+def optimize_future_deployments():
+    failures = analyze_deployment_logs()
+    if failures > 5:
+        print("Consider adjusting deployment frequency or improving rollback mechanisms.")
+        function optimizeFutureDeployments() {
+    const failures = analyzeDeploymentLogs();
+    if (failures > 5) {
+        console.log("Consider adjusting deployment frequency or improving rollback mechanisms.");
+    }
+}
+name: Deployment Analytics
+
+on:
+  workflow_run:
+    workflows: ["Deployment Validation"]
+    types:
+      - completed
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Run Deployment Analysis
+        run: |
+          python analyze_deployment_logs.py
+          node analyzeDeploymentLogs.js
+          python analyze_deployment_logs.py
+          node analyzeDeploymentLogs.js
+          docker logs your-app
+          aws deploy get-deployment-status --application-name your-app --deployment-group your-group
+          
